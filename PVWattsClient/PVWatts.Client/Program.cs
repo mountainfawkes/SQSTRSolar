@@ -1,18 +1,23 @@
 ﻿using System.Net.Http.Headers;
+using PVWatts.Client.Models;
 
 using HttpClient client = new();
 client.DefaultRequestHeaders.Accept.Clear();
 client.DefaultRequestHeaders.Accept.Add(
   new MediaTypeWithQualityHeaderValue("application/json"));
 
-await GetSolarPVPotential(client);
+var apiKey = Environment.GetEnvironmentVariable("PVWattsKey");
+// When launched from Finder on Mac, this project will not inherit environment variables.
+// To resolve, launch VS Code from the Terminal.
 
-static async Task GetSolarPVPotential(HttpClient client)
+await GetSolarPVPotential(client, apiKey);
+
+static async Task GetSolarPVPotential(HttpClient client, string key)
 {
   try
   {
     var json = await client.GetStringAsync(
-      "https://developer.nrel.gov/api/pvwatts/v8.json?api_key=[REDACTED]&system_capacity=7.5&module_type=0&losses=23.8&array_type=1&tilt=26.565&azimuth=162.5&lat=45.55908915917461&lon=-122.68163691381875"
+      $"https://developer.nrel.gov/api/pvwatts/v8.json?api_key={key}&system_capacity={Request.SystemCapacity}&module_type={Request.ModuleType}&losses={Request.Losses}&array_type={Request.ArrayType}&tilt={Request.Tilt}&azimuth={Request.Azimuth}&lat={Request.Lat}&lon={Request.Lon}"
     );
 
     Console.Write(json);
